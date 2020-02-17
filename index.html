@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/110/three.min.js"></script>
+    <script src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.0.5/gsap.min.js"></script>
+    <script src="js/sticks.js" type="module" defer></script>
+    <script src="js/index.js" type="module" defer></script>
+    <!-- <script id="vertexShader" type="x-shader/x-vertex">
+        varying vec3 vNormal;
+        varying vec3 vPositionNormal;
+        void main() 
+        {
+            vNormal = normalize( normalMatrix * normal ); // 转换到视图空间
+            vPositionNormal = normalize(( modelViewMatrix * vec4(position, 1.0) ).xyz);
+            gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+        }
+    </script> -->
+    <!-- fragment shader a.k.a. pixel shader -->
+    <!-- <script id="fragmentShader" type="x-shader/x-vertex"> 
+        uniform vec3 glowColor;
+        uniform float b;
+        uniform float p;
+        uniform float s;
+        varying vec3 vNormal;
+        varying vec3 vPositionNormal;
+        void main() 
+        {
+            float a = pow( b + s * abs(dot(vNormal, vPositionNormal)), p );
+            gl_FragColor = vec4( glowColor, a );
+        }
+    </script> -->
+    <link rel="stylesheet" href="./dist/css/styles.css">
+    <title>AWESOME</title>
+</head>
+<body>
+    <svg>
+    <filter id="squiggly">
+        <feTurbulence baseFrequency="0.002 0.006" numOctaves="3" result="noise" seed="1"/>
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="25" />
+  </filter>
+</svg>
+
+<svg>
+<filter id="conform" x="-50%" y="-50%" width="200%" height="200%"> 
+        
+    <!-- Get the image. -->
+    <feImage xlink:href="https://i1.wp.com/omega-products.com/wp-content/uploads/2017/11/Heavy-Lace.png" x="0" y="0" width="100%" height="100%" preserveAspectRatio="none"></feImage>
+    
+    <!-- Desaturate the image. -->
+    <feColorMatrix type="saturate" values="0" result="IMAGE"/>
+
+    <!-- decrease level of details so the effect on text is more realistic -->
+    <feGaussianBlur in="IMAGE" stdDeviation="0.25" result="MAP"></feGaussianBlur>
+    
+    <!-- Use the displacement map to distort the source text -->
+    <feDisplacementMap in="SourceGraphic" in2="MAP" scale="15" xChannelSelector="R" yChannelSelector="R" result="TEXTURED_TEXT"></feDisplacementMap>
+</filter>
+</svg>
+
+<svg>
+    <filter id='titleNoise'>
+        <feTurbulence id ="turb" type="turbulence" baseFrequency="0.035 0.8" result="NOISE" numOctaves="4" />
+        <feDisplacementMap in="SourceGraphic" in2="NOISE" scale="30" xChannelSelector="R" yChannelSelector="R"></feDisplacementMap>
+      </filter>
+      
+      
+</svg>
+
+<svg>
+    <filter id="opacityFilter">
+        <feColorMatrix id="opacity" type="matrix" values="0 0 0 0 0
+        0 0 0 0 0
+        0 0 0 0 0
+        0   0   0  1 0" result="OPACITY">
+  </feColorMatrix>
+        <feDisplacementMap in="SourceGraphic" in2="OPACITY" scale="23" xChannelSelector="R" yChannelSelector="R" result="TEXTURED_TEXT"></feDisplacementMap>
+    </filter>
+    
+</svg>
+
+    <div class="container">
+        
+        <div class="nav__container">
+            <input id="nav-toggle" type="checkbox" class="nav__input">
+            <label class="nav__toggle" for="nav-toggle">
+                <span class="nav__toggle-stripe nav__toggle-stripe--0"></span>
+                <span class="nav__toggle-stripe nav__toggle-stripe--1"></span>
+                <span class="nav__toggle-stripe nav__toggle-stripe--2"></span>
+                <span class="nav__toggle-stripe nav__toggle-stripe--3"></span> 
+            </label>
+            <div class="nav">
+                <ul class="nav__list">
+                    <li class="nav__item">
+                        <a href="#1section" class="nav__link">About</a>
+                    </li>
+                    <li class="nav__item">
+                        <a href="#2section" class="nav__link">Skills</a>
+                    </li>
+                    <li class="nav__item">
+                        <a href="#3section" class="nav__link">Works</a>
+                    </li>
+                    <li class="nav__item">
+                        <a href="#4section" class="nav__link">Pour your <span id="heart">&#x2764;</span> out</a>
+                    </li>
+                </ul>
+                <!-- <span class="nav__underlay nav__underlay--0"></span>
+                <span class="nav__underlay nav__underlay--1"></span> -->
+            </div>
+        </div>
+        <div id="1section" class="section section--about active-up ">
+            <div class="canvas"></div>
+            <div class="section__container section__container--about">
+                <span class="section__scroll-indicator"></span>
+                <div class="section__title section__title--about">
+                    <span>Daniel</span><span>Mizrachi</span>
+                </div>
+                <div class="section__dream">
+                    <!-- <span>Front</span><span>End</span><span>Developer</span> -->
+                </div>
+            </div>
+        </div>
+        <div id="2section" class="section section--skills ">
+            <div  class="section__container section__container--skills">
+                <div class="section__title-container section__title-container--skills">
+                    <h1 class="section__title section__title--skills">Skills</h1>
+                </div>
+                <div class="skills">
+                    <div class="skills__skill">
+                        <svg class="skills__img" viewBox="0 0 100 100">
+                            <use xlink:href="https://github.com/prplx/svg-logos/raw/master/svg/html5.svg?sanitize=true"/>                        </svg>
+                        <!-- <img src="https://github.com/prplx/svg-logos/raw/master/svg/html5.svg?sanitize=true" class="skills__img"> -->
+                        <div class="skills__desc-box"><h2 class="skills__desc">HTML5</h2></div>
+                    </div>
+                    <div class="skills__skill">
+                        <svg class="skills__img" viewBox="0 0 100 100">
+                            <use xlink:href="https://github.com/prplx/svg-logos/raw/master/svg/html5.svg?sanitize=true"/>                        </svg>
+                        <!-- <img src="https://github.com/prplx/svg-logos/raw/master/svg/html5.svg?sanitize=true" class="skills__img"> -->
+                        <div class="skills__desc-box"><h2 class="skills__desc">CSS3</h2></div>
+                    </div>
+                    <div class="skills__skill">
+                        <svg class="skills__img" viewBox="0 0 100 100">
+                            <use xlink:href="https://github.com/prplx/svg-logos/raw/master/svg/html5.svg?sanitize=true"/>                        </svg>
+                        <!-- <img src="https://github.com/prplx/svg-logos/raw/master/svg/html5.svg?sanitize=true" class="skills__img"> -->
+                        <div class="skills__desc-box"><h2 class="skills__desc">Javascript</h2></div>
+                    </div>
+                    <div class="skills__skill">
+                        <svg class="skills__img" viewBox="0 0 100 100">
+                            <use xlink:href="https://github.com/prplx/svg-logos/raw/master/svg/html5.svg?sanitize=true"/>                        </svg>
+                        <!-- <img src="https://github.com/prplx/svg-logos/raw/master/svg/html5.svg?sanitize=true" class="skills__img"> -->
+                        <div class="skills__desc-box"><h2 class="skills__desc">Sass</h2></div>
+                    </div>
+                    <div class="skills__skill">
+                        <svg class="skills__img" viewBox="0 0 100 100">
+                            <use xlink:href="https://github.com/prplx/svg-logos/raw/master/svg/html5.svg?sanitize=true"/>                        </svg>
+                        <!-- <img src="https://github.com/prplx/svg-logos/raw/master/svg/html5.svg?sanitize=true" class="skills__img"> -->
+                        <div class="skills__desc-box"><h2 class="skills__desc">ReactJS</h2></div>
+                    </div>
+                    <div class="skills__skill">
+                        <svg class="skills__img" viewBox="0 0 100 100">
+                            <use xlink:href="https://github.com/prplx/svg-logos/raw/master/svg/html5.svg?sanitize=true"/>                        </svg>
+                        <!-- <img src="https://github.com/prplx/svg-logos/raw/master/svg/html5.svg?sanitize=true" class="skills__img"> -->
+                        <div class="skills__desc-box"><h2 class="skills__desc">Redux</h2></div>
+                    </div>
+                    <div class="skills__skill">
+                        <svg class="skills__img" viewBox="0 0 100 100">
+                            <use xlink:href="https://github.com/prplx/svg-logos/raw/master/svg/html5.svg?sanitize=true"/>                        </svg>
+                        <!-- <img src="https://github.com/prplx/svg-logos/raw/master/svg/html5.svg?sanitize=true" class="skills__img"> -->
+                        <div class="skills__desc-box"><h2 class="skills__desc">Git</h2></div>
+                    </div>
+                    <div class="skills__skill">
+                        <svg class="skills__img" viewBox="0 0 100 100">
+                            <use xlink:href="https://github.com/prplx/svg-logos/raw/master/svg/html5.svg?sanitize=true"/>                        </svg>
+                        <!-- <img src="https://github.com/prplx/svg-logos/raw/master/svg/html5.svg?sanitize=true" class="skills__img"> -->
+                        <div class="skills__desc-box"><h2 class="skills__desc">Node Package Manager</h2></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="3section" class="section section--works ">
+            <div class="section__container section__container--works">
+                <div class="section__title-container section__title-container--works">
+                    <h1 class="section__title section__title--works">Works</h1>
+                </div>
+                <div class="works__container">
+                    <!-- <span class="works__nav works__nav--up">
+                        <svg class="works__nav-icon">
+                            <use xlink:href="img/sprite.svg#chevron-thin-down"></use>
+                        </svg>
+                    </span>
+                    <span class="works__nav works__nav--down"></span> -->
+                    <div class="works__work">
+                        <img src="img\projectImgs\project-1.png" class="works__img" alt="">
+                    </div>
+                    <div class="works__work">
+                        <img src="img\projectImgs\project-2.png" class="works__img" alt="">
+                    </div>
+                    <div class="works__work">
+                        <img src="img\projectImgs\project-3.png" class="works__img" alt="">
+                    </div>
+                    <div class="works__work">
+                        <img src="img\projectImgs\project-4.png" class="works__img" alt="">
+                    </div>
+                    <div class="works__work"></div>
+                    <div class="works__work"></div>
+                    <!-- <div class="works__work"></div>
+                    <div class="works__work"></div>
+                    <div class="works__work"></div>
+                    <div class="works__work"></div>
+                    <div class="works__work"></div>
+                    <div class="works__work"></div>
+                    <div class="works__work"></div>
+                    <div class="works__work"></div>
+                    <div class="works__work"></div> -->
+
+                </div>
+            </div>
+        </div>
+        <div id="4section" class="section section--contact">
+            <div class="section__container section__container--contact">
+                <div class="section__title-container section__title-container--contact">
+                    <h1 class="section__title section__title--contact ">Contact Me</h1>
+                </div>
+<!-- 
+                <form action="" class="form">
+                    <div class="form__group">
+                        <input type="text" class="form__field">
+                    </div>
+                    <div class="form__group">
+                        <input type="text" class="form__field">
+                    </div>
+                    <div class="form__group">
+                        <textarea class="form__field">
+                    </div>
+                </form> -->
+
+
+                <form action="" class="form">
+                    <div class="form__group">
+                        <label for="name" class="form__label">Name</label>
+                        <input type="text" class="form__input form__input--name" name="message" id="message" autocomplete="off" required>
+                    </div>
+                    <div class="form__group">
+                        <label for="email" class="form__label">Email</label>
+                        <input type="text" class="form__input form__input--email" name="message" id="message" autocomplete="off" required>                            
+                    </div>
+                    <div class="form__group form__group--message">
+                        <label for="message" class="form__label">Your words</label>
+                        <textarea type="text" class="form__input form__input--message" name="message" id="message" required></textarea>
+                    </div>
+                    <button class="form__submit">submit</button>
+                </form>
+
+
+
+                
+            </div>
+            
+        </div>
+        
+    </div>
+</body>
+</html>
